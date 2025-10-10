@@ -60,3 +60,5 @@ docker run --rm public.ecr.aws/lambda/python:3.12-x86_64 /bin/sh -c "curl -v htt
 {
   "max-concurrent-downloads": 1 
 }
+py -3.12 -m pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org
+py -3.12 -m pip install hvac requests certifi charset-normalizer idna pyhdcl urllib3 -t python/lib/python3.12/site-packages --platform manylinux2014_x86_64 --only-binary :all: --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org
