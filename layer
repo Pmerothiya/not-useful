@@ -1,0 +1,55 @@
+
+The files shown in your image are for Python 3.9 (as seen in the path: python3.9\site-packages). You cannot simply rename the folder to get it working for Python 3.12, as the files must be compiled for the AWS Lambda's Linux environment and the Python 3.12 runtime.
+
+Since you are working on a Windows machine, the most reliable way to create a Python 3.12 layer compatible with AWS Lambda is by using Docker to ensure the dependencies are built for Linux.
+
+Here is the step-by-step process using PowerShell and Docker.
+
+Step 1: Prepare the Dependencies List
+First, create a list of the packages visible in your image.
+
+Create a new folder for your layer (e.g., hvac-layer-312).
+
+Inside that folder, create a file named requirements.txt and list the main packages you see:
+
+Code snippet
+
+hvac
+requests
+certifi
+charset-normalizer
+idna
+pyhdcl
+urllib3
+Step 2: Build the Layer using Docker (Recommended Method)
+This method uses the official AWS Lambda container image to build the dependencies correctly for the Linux execution environment.
+
+Prerequisites
+You must have Docker Desktop installed and running on your Windows machine.
+
+Commands in PowerShell
+Run the following commands from your layer's folder (e.g., hvac-layer-312):
+
+Command	Description
+docker run --rm -v ${PWD}:/var/task public.ecr.aws/lambda/python:3.12-x86_64 /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.12/site-packages"	Builds the layer. It uses the AWS Python 3.12 Linux image to run pip install, putting the dependencies into the required python/lib/python3.12/site-packages structure in your local folder.
+
+Export to Sheets
+Step 3: Package the Layer and Clean Up
+After Docker finishes, you'll have a new python folder containing the dependencies. You need to zip this folder.
+
+Commands in PowerShell
+Command	Description
+cd python/lib/python3.12/site-packages	Navigate to the packages directory.
+Remove-Item *dist-info -Recurse -Force -ErrorAction SilentlyContinue	Removes unnecessary metadata folders to reduce the final zip size.
+cd ..\..\..\..	Go back to the layer's base directory (hvac-layer-312).
+Compress-Archive -Path python -DestinationPath hvac-layer-312.zip	Creates the final .zip file ready for upload.
+
+Export to Sheets
+Step 4: Upload to AWS
+Go to the AWS Lambda console, navigate to Layers.
+
+Create a new version (or a new layer) and upload your hvac-layer-312.zip file.
+
+Ensure you set the Compatible runtime to Python 3.12.
+
+Update the Lambda function that uses this layer by setting its runtime to Python 3.12 and attaching the new layer version.
