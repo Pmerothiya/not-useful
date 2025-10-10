@@ -53,3 +53,6 @@ Create a new version (or a new layer) and upload your hvac-layer-312.zip file.
 Ensure you set the Compatible runtime to Python 3.12.
 
 Update the Lambda function that uses this layer by setting its runtime to Python 3.12 and attaching the new layer version.
+
+
+docker run --rm public.ecr.aws/lambda/python:3.12-x86_64 /bin/sh -c "curl -v https://pypi.org"
